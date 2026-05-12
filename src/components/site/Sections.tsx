@@ -1,8 +1,11 @@
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import {
   AlertTriangle, Boxes, Bot, Cpu, DollarSign, FileCode2, Globe, GitBranch,
   LayoutDashboard, MessageSquare, PackageSearch, Rocket, Settings, ShieldCheck,
-  Sparkles, TerminalSquare, Workflow, Zap, Check, ArrowRight, Database, Cloud,
+  Sparkles, TerminalSquare, Zap, Check, ArrowRight, Database, Cloud,
   Github, Server, Send, User, ChevronRight,
+  Eye, EyeOff, Key, Plus, Trash2,
 } from "lucide-react";
 
 /* ------------------------------- Section UI ------------------------------- */
@@ -86,11 +89,10 @@ export function ChatbotFirst() {
               <div key={s.label} className="flex items-center gap-3">
                 <div className="flex flex-col items-center gap-2">
                   <div
-                    className={`grid h-12 w-12 place-items-center rounded-2xl border ${
-                      i === 3
+                    className={`grid h-12 w-12 place-items-center rounded-2xl border ${i === 3
                         ? "border-primary/60 bg-gradient-primary glow text-primary-foreground"
                         : "border-glass-border bg-glass text-cyan"
-                    }`}
+                      }`}
                   >
                     <s.icon className="h-5 w-5" />
                   </div>
@@ -171,6 +173,7 @@ const sidebar = [
 ];
 
 export function ProductDashboard() {
+  const navigate = useNavigate();
   return (
     <section id="product" className="relative py-24">
       <SectionHeader
@@ -205,11 +208,10 @@ export function ProductDashboard() {
                 {sidebar.map((s) => (
                   <button
                     key={s.l}
-                    className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${
-                      s.active
+                    className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition ${s.active
                         ? "bg-primary/10 text-foreground ring-1 ring-primary/30"
                         : "text-muted-foreground hover:bg-glass hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <s.i className="h-4 w-4" />
                     {s.l}
@@ -239,7 +241,10 @@ export function ProductDashboard() {
                       </div>
                     </div>
                   ))}
-                  <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-primary px-4 py-2.5 text-sm font-medium text-primary-foreground glow">
+                  <button
+                    onClick={() => navigate({ to: "/chatbot" })}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-primary px-4 py-2.5 text-sm font-medium text-primary-foreground glow"
+                  >
                     Continue with AI Chat <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
@@ -626,11 +631,10 @@ export function Pricing() {
         {tiers.map((t) => (
           <div
             key={t.name}
-            className={`relative rounded-3xl p-6 ${
-              t.featured
+            className={`relative rounded-3xl p-6 ${t.featured
                 ? "ring-gradient bg-gradient-to-b from-primary/10 to-transparent shadow-card glow"
                 : "glass"
-            }`}
+              }`}
           >
             {t.featured && (
               <span className="absolute -top-3 left-6 rounded-full bg-gradient-primary px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">
@@ -651,16 +655,244 @@ export function Pricing() {
               ))}
             </ul>
             <button
-              className={`mt-6 w-full rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-                t.featured
+              className={`mt-6 w-full rounded-xl px-4 py-2.5 text-sm font-medium transition ${t.featured
                   ? "bg-gradient-primary text-primary-foreground glow hover:opacity-90"
                   : "border border-glass-border bg-glass hover:border-primary/40"
-              }`}
+                }`}
             >
               {t.cta}
             </button>
           </div>
         ))}
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------------- Keys ---------------------------------- */
+
+const PROVIDER_KEYS: { provider: string; fields: { key: string; label: string; placeholder: string }[] }[] = [
+  {
+    provider: "AWS",
+    fields: [
+      { key: "aws_access_key_id", label: "Access Key ID", placeholder: "AKIAIOSFODNN7EXAMPLE" },
+      { key: "aws_secret_access_key", label: "Secret Access Key", placeholder: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" },
+    ],
+  },
+  {
+    provider: "Vercel",
+    fields: [
+      { key: "vercel_token", label: "API Token", placeholder: "vercel_xxxxxxxxxxxxxxxx" },
+    ],
+  },
+  {
+    provider: "Railway",
+    fields: [
+      { key: "railway_token", label: "API Token", placeholder: "railway_xxxxxxxxxxxxxxxx" },
+    ],
+  },
+  {
+    provider: "Supabase",
+    fields: [
+      { key: "supabase_url", label: "Project URL", placeholder: "https://xxxx.supabase.co" },
+      { key: "supabase_anon_key", label: "Anon Key", placeholder: "eyJhbGciOiJIUzI1NiIs..." },
+      { key: "supabase_service_key", label: "Service Role Key", placeholder: "eyJhbGciOiJIUzI1NiIs..." },
+    ],
+  },
+  {
+    provider: "DigitalOcean",
+    fields: [
+      { key: "do_token", label: "Personal Access Token", placeholder: "dop_v1_xxxxxxxxxxxxxxxx" },
+    ],
+  },
+  {
+    provider: "GCP",
+    fields: [
+      { key: "gcp_project_id", label: "Project ID", placeholder: "my-project-123456" },
+      { key: "gcp_service_account_json", label: "Service Account JSON", placeholder: '{ "type": "service_account", ... }' },
+    ],
+  },
+  {
+    provider: "Azure",
+    fields: [
+      { key: "azure_subscription_id", label: "Subscription ID", placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" },
+      { key: "azure_client_id", label: "Client ID", placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" },
+      { key: "azure_client_secret", label: "Client Secret", placeholder: "xxxxxxxxxxxxxxxxxxxxxxxx" },
+    ],
+  },
+  {
+    provider: "Netlify",
+    fields: [
+      { key: "netlify_token", label: "Personal Access Token", placeholder: "nfp_xxxxxxxxxxxxxxxx" },
+    ],
+  },
+  {
+    provider: "Render",
+    fields: [
+      { key: "render_api_key", label: "API Key", placeholder: "rnd_xxxxxxxxxxxxxxxx" },
+    ],
+  },
+  {
+    provider: "Fly.io",
+    fields: [
+      { key: "fly_api_token", label: "API Token", placeholder: "FlyV1 xxxxxxxxxxxxxxxx" },
+    ],
+  },
+];
+
+export function Keys() {
+  const [selected, setSelected] = useState<string>(PROVIDER_KEYS[0].provider);
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [visible, setVisible] = useState<Record<string, boolean>>({});
+  const [saved, setSaved] = useState<Record<string, boolean>>({});
+
+  const activeProvider = PROVIDER_KEYS.find((p) => p.provider === selected)!;
+
+  function toggleVisible(key: string) {
+    setVisible((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  function handleSave() {
+    setSaved((prev) => ({ ...prev, [selected]: true }));
+    setTimeout(() => setSaved((prev) => ({ ...prev, [selected]: false })), 2000);
+  }
+
+  function handleClear() {
+    activeProvider.fields.forEach((f) => {
+      setValues((prev) => ({ ...prev, [f.key]: "" }));
+    });
+    setSaved((prev) => ({ ...prev, [selected]: false }));
+  }
+
+  const isProviderFilled = (provider: typeof PROVIDER_KEYS[number]) =>
+    provider.fields.every((f) => !!values[f.key]);
+
+  return (
+    <section id="keys" className="relative py-24">
+      <SectionHeader
+        tag="Provider Keys"
+        title={<>Manage your <span className="text-gradient">API credentials.</span></>}
+        sub="Store your provider API keys securely. Keys are only used during AI analysis and never shared."
+      />
+
+      <div className="mx-auto mt-12 max-w-6xl px-4">
+        <div className="glass ring-gradient overflow-hidden rounded-3xl shadow-card">
+          {/* window chrome */}
+          <div className="flex items-center justify-between border-b border-glass-border bg-background/40 px-4 py-3">
+            <div className="flex items-center gap-1.5">
+              <span className="h-3 w-3 rounded-full bg-destructive/70" />
+              <span className="h-3 w-3 rounded-full bg-chart-4/70" />
+              <span className="h-3 w-3 rounded-full bg-mint/70" />
+            </div>
+            <span className="font-mono text-xs text-muted-foreground">app.deploybuddy.dev / keys</span>
+            <span className="font-mono text-xs text-muted-foreground">🔒 local only</span>
+          </div>
+
+          <div className="grid md:grid-cols-[240px_1fr]">
+            {/* ── Left panel: provider list ── */}
+            <aside className="border-b border-glass-border md:border-b-0 md:border-r md:border-glass-border">
+              <div className="p-3">
+                <p className="px-2 pb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Providers
+                </p>
+                <nav className="space-y-1">
+                  {PROVIDER_KEYS.map((p) => {
+                    const filled = isProviderFilled(p);
+                    return (
+                      <button
+                        key={p.provider}
+                        onClick={() => setSelected(p.provider)}
+                        className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm transition ${
+                          selected === p.provider
+                            ? "bg-primary/10 text-foreground ring-1 ring-primary/30"
+                            : "text-muted-foreground hover:bg-glass hover:text-foreground"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div
+                            className={`grid h-7 w-7 place-items-center rounded-lg ${
+                              selected === p.provider ? "bg-gradient-primary glow" : "bg-secondary"
+                            }`}
+                          >
+                            <Key className="h-3.5 w-3.5 text-primary-foreground" />
+                          </div>
+                          <span className="font-medium">{p.provider}</span>
+                        </div>
+                        {filled && (
+                          <span className="h-2 w-2 rounded-full bg-mint" title="Key saved" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </nav>
+              </div>
+            </aside>
+
+            {/* ── Right panel: form ── */}
+            <div className="p-5 md:p-6">
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold">{activeProvider.provider}</h3>
+                  <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
+                    {activeProvider.fields.length} credential{activeProvider.fields.length > 1 ? "s" : ""} required
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleClear}
+                    className="flex items-center gap-1.5 rounded-xl border border-glass-border bg-glass px-3 py-1.5 text-xs text-muted-foreground transition hover:border-destructive/40 hover:text-destructive"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Clear
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="flex items-center gap-1.5 rounded-xl bg-gradient-primary px-3 py-1.5 text-xs font-medium text-primary-foreground glow transition hover:opacity-90"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    {saved[selected] ? "Saved ✓" : "Save Keys"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {activeProvider.fields.map((field) => (
+                  <div key={field.key} className="rounded-xl border border-glass-border bg-background/30">
+                    <div className="flex items-center justify-between border-b border-glass-border px-3 py-2">
+                      <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                        {field.label}
+                      </p>
+                      <button
+                        onClick={() => toggleVisible(field.key)}
+                        className="text-muted-foreground transition hover:text-foreground"
+                      >
+                        {visible[field.key]
+                          ? <EyeOff className="h-3.5 w-3.5" />
+                          : <Eye className="h-3.5 w-3.5" />
+                        }
+                      </button>
+                    </div>
+                    <input
+                      type={visible[field.key] ? "text" : "password"}
+                      value={values[field.key] ?? ""}
+                      onChange={(e) => setValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                      placeholder={field.placeholder}
+                      className="w-full bg-transparent px-3 py-2.5 font-mono text-sm outline-none placeholder:text-muted-foreground/50"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* info note */}
+              <div className="mt-5 flex items-start gap-2 rounded-xl border border-glass-border bg-glass px-3 py-2.5 text-xs text-muted-foreground">
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-mint" />
+                <p>
+                  Keys are stored locally in your browser and never sent to our servers. They are only used to interact directly with provider APIs during deployment analysis.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -1,6 +1,22 @@
-import { Github, ChevronDown, Sparkles, ArrowRight, Send, Bot, User } from "lucide-react";
+import { useState } from "react";
+import { Github, ChevronDown, Sparkles, ArrowRight, Send, Bot, User, DollarSign } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
 export function SetupAndChat() {
+  const navigate = useNavigate();
+
+  const [repo, setRepo]         = useState("github.com/username/project");
+  const [service, setService]   = useState("Fullstack App");
+  const [location, setLocation] = useState("Southeast Asia");
+  const [budget, setBudget]     = useState("");
+
+  function handleContinue() {
+    navigate({
+      to: "/chatbot",
+      search: { repo, service, location, budget: budget || "30" },
+    });
+  }
+
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_1.15fr]">
       {/* Quick Setup Form */}
@@ -17,28 +33,56 @@ export function SetupAndChat() {
         <p className="mt-1 text-sm text-muted-foreground">Provide context, then continue with AI Chat.</p>
 
         <div className="mt-5 space-y-4">
+
+          {/* GitHub Repo */}
           <Field label="GitHub Repository URL" icon={<Github className="h-4 w-4" />}>
             <input
-              defaultValue="github.com/username/project"
+              value={repo}
+              onChange={(e) => setRepo(e.target.value)}
+              placeholder="github.com/username/project"
               className="w-full bg-transparent text-sm font-mono outline-none placeholder:text-muted-foreground"
             />
           </Field>
 
-          <Field label="Service Type" icon={<Sparkles className="h-4 w-4" />}>
-            <div className="flex w-full items-center justify-between text-sm">
-              <span>Fullstack App</span>
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            </div>
+         {/* Service Type */}
+            <Field label="Service Type" icon={<Sparkles className="h-4 w-4" />}>
+              <input
+                type="text"
+                value={service}
+                onChange={(e) => setService(e.target.value)}
+                placeholder="e.g. Fullstack App"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              />
+            </Field>
+
+            {/* Target Location */}
+              <Field label="Target Location" icon={<span className="text-xs">🌏</span>}>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g. Southeast Asia"
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                />
+              </Field>
+
+          {/* Monthly Budget */}
+          <Field label="Monthly Budget (USD)" icon={<DollarSign className="h-4 w-4" />}>
+            <input
+              type="number"
+              min="1"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
+              placeholder="e.g. 30"
+              className="w-full bg-transparent text-sm font-mono outline-none placeholder:text-muted-foreground [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+            <span className="shrink-0 text-xs text-muted-foreground">/mo</span>
           </Field>
 
-          <Field label="Target Location" icon={<span className="text-xs">🌏</span>}>
-            <div className="flex w-full items-center justify-between text-sm">
-              <span>Southeast Asia</span>
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </Field>
-
-          <button className="group mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary px-4 py-3 text-sm font-medium text-primary-foreground glow hover:opacity-90 transition">
+          <button
+            onClick={handleContinue}
+            className="group mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary px-4 py-3 text-sm font-medium text-primary-foreground glow hover:opacity-90 transition"
+          >
             Continue with AI Chat
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </button>
@@ -53,7 +97,7 @@ export function SetupAndChat() {
         </div>
       </div>
 
-      {/* Chatbot */}
+      {/* Chatbot Preview */}
       <div className="glass ring-gradient relative overflow-hidden rounded-3xl p-5 shadow-card">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -118,7 +162,10 @@ export function SetupAndChat() {
               placeholder="Describe your deployment goal, budget, traffic..."
               className="w-full bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground"
             />
-            <button className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-primary glow">
+            <button
+              onClick={handleContinue}
+              className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-primary glow"
+            >
               <Send className="h-4 w-4 text-primary-foreground" />
             </button>
           </div>

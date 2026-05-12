@@ -6,6 +6,7 @@ import {
   Problem, ChatbotFirst, HowItWorks, ProductDashboard, Features,
   AgentWorkflow, ChatExample, Providers, Architecture, Pricing, FinalCTA, Footer,
 } from "@/components/site/Sections";
+import { Keys } from "@/components/site/Sections";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -69,6 +70,7 @@ function Index() {
       <Providers />
       <Architecture />
       <Pricing />
+      <Keys />
       <FinalCTA />
       <Footer />
     </div>
