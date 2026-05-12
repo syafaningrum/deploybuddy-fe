@@ -2,9 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, PlayCircle, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { SetupAndChat } from "@/components/site/SetupAndChat";
+// import {
+//   Problem, ChatbotFirst, HowItWorks, ProductDashboard, Features,
+//   AgentWorkflow, ChatExample, Providers, Architecture, Pricing, FinalCTA, Footer,
+// } from "@/components/site/Sections";
 import {
   Problem, ChatbotFirst, HowItWorks, ProductDashboard, Features,
-  AgentWorkflow, ChatExample, Providers, Architecture, Pricing, FinalCTA, Footer,
+  AgentWorkflow, ChatExample, Providers, Architecture, FinalCTA, Footer,
 } from "@/components/site/Sections";
 import { Keys } from "@/components/site/Sections";
 
@@ -69,7 +73,7 @@ function Index() {
       <ChatExample />
       <Providers />
       <Architecture />
-      <Pricing />
+      {/* <Pricing /> */}
       <Keys />
       <FinalCTA />
       <Footer />

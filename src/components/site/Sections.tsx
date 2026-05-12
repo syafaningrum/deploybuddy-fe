@@ -605,69 +605,69 @@ export function Architecture() {
 
 /* -------------------------------- Pricing -------------------------------- */
 
-const tiers = [
-  {
-    name: "Free", price: "$0", sub: "Try DeployBuddy",
-    features: ["3 AI recommendations/month", "Basic repository analysis", "Basic provider recommendation", "Manual deployment guide"],
-    cta: "Start free", featured: false,
-  },
-  {
-    name: "Pro", price: "$19", sub: "per month",
-    features: ["Unlimited recommendations", "Advanced AI chatbot", "Cost estimation", "Provider comparison", "IaC config suggestions", "Deployment guide export"],
-    cta: "Upgrade to Pro", featured: true,
-  },
-  {
-    name: "Team", price: "$49", sub: "per seat / month",
-    features: ["Shared projects", "Team collaboration", "Deployment history", "Provider credential management", "Advanced workspace"],
-    cta: "Start team trial", featured: false,
-  },
-];
+// const tiers = [
+//   {
+//     name: "Free", price: "$0", sub: "Try DeployBuddy",
+//     features: ["3 AI recommendations/month", "Basic repository analysis", "Basic provider recommendation", "Manual deployment guide"],
+//     cta: "Start free", featured: false,
+//   },
+//   {
+//     name: "Pro", price: "$19", sub: "per month",
+//     features: ["Unlimited recommendations", "Advanced AI chatbot", "Cost estimation", "Provider comparison", "IaC config suggestions", "Deployment guide export"],
+//     cta: "Upgrade to Pro", featured: true,
+//   },
+//   {
+//     name: "Team", price: "$49", sub: "per seat / month",
+//     features: ["Shared projects", "Team collaboration", "Deployment history", "Provider credential management", "Advanced workspace"],
+//     cta: "Start team trial", featured: false,
+//   },
+// ];
 
-export function Pricing() {
-  return (
-    <section id="pricing" className="relative py-24">
-      <SectionHeader tag="Pricing" title="Start free. Upgrade when you ship." />
-      <div className="mx-auto mt-12 grid max-w-6xl gap-5 px-4 md:grid-cols-3">
-        {tiers.map((t) => (
-          <div
-            key={t.name}
-            className={`relative rounded-3xl p-6 ${t.featured
-                ? "ring-gradient bg-gradient-to-b from-primary/10 to-transparent shadow-card glow"
-                : "glass"
-              }`}
-          >
-            {t.featured && (
-              <span className="absolute -top-3 left-6 rounded-full bg-gradient-primary px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">
-                Most popular
-              </span>
-            )}
-            <p className="text-sm font-medium text-muted-foreground">{t.name}</p>
-            <div className="mt-3 flex items-baseline gap-1">
-              <span className="text-4xl font-semibold tracking-tight">{t.price}</span>
-              <span className="text-sm text-muted-foreground">{t.sub}</span>
-            </div>
-            <ul className="mt-6 space-y-2.5">
-              {t.features.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-mint" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              className={`mt-6 w-full rounded-xl px-4 py-2.5 text-sm font-medium transition ${t.featured
-                  ? "bg-gradient-primary text-primary-foreground glow hover:opacity-90"
-                  : "border border-glass-border bg-glass hover:border-primary/40"
-                }`}
-            >
-              {t.cta}
-            </button>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
+// export function Pricing() {
+//   return (
+//     <section id="pricing" className="relative py-24">
+//       <SectionHeader tag="Pricing" title="Start free. Upgrade when you ship." />
+//       <div className="mx-auto mt-12 grid max-w-6xl gap-5 px-4 md:grid-cols-3">
+//         {tiers.map((t) => (
+//           <div
+//             key={t.name}
+//             className={`relative rounded-3xl p-6 ${t.featured
+//                 ? "ring-gradient bg-gradient-to-b from-primary/10 to-transparent shadow-card glow"
+//                 : "glass"
+//               }`}
+//           >
+//             {t.featured && (
+//               <span className="absolute -top-3 left-6 rounded-full bg-gradient-primary px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">
+//                 Most popular
+//               </span>
+//             )}
+//             <p className="text-sm font-medium text-muted-foreground">{t.name}</p>
+//             <div className="mt-3 flex items-baseline gap-1">
+//               <span className="text-4xl font-semibold tracking-tight">{t.price}</span>
+//               <span className="text-sm text-muted-foreground">{t.sub}</span>
+//             </div>
+//             <ul className="mt-6 space-y-2.5">
+//               {t.features.map((f) => (
+//                 <li key={f} className="flex items-start gap-2 text-sm">
+//                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-mint" />
+//                   <span>{f}</span>
+//                 </li>
+//               ))}
+//             </ul>
+//             <button
+//               className={`mt-6 w-full rounded-xl px-4 py-2.5 text-sm font-medium transition ${t.featured
+//                   ? "bg-gradient-primary text-primary-foreground glow hover:opacity-90"
+//                   : "border border-glass-border bg-glass hover:border-primary/40"
+//                 }`}
+//             >
+//               {t.cta}
+//             </button>
+//           </div>
+//         ))}
+//       </div>
+//     </section>
+//   );
+// }
 
 /* --------------------------------- Keys ---------------------------------- */
 

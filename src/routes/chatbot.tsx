@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
-import { Bot, User, Send, ArrowLeft, Rocket } from "lucide-react";
+import { Bot, User, Send, ArrowLeft, Rocket, DollarSign, Zap, CheckCircle, XCircle } from "lucide-react";
 import { z } from "zod";
 import {
   analyzeDeployment,
@@ -36,6 +36,20 @@ interface Pill {
   tone?: "warn";
 }
 
+interface CostBreakdownItem {
+  item: string;
+  cost: string;
+}
+
+interface Alternative {
+  provider: string;
+  architecture: string;
+  monthly_estimate: string;
+  pros: string[];
+  cons: string[];
+  best_for: string;
+}
+
 interface Recommendation {
   stack_detected: string[];
   architecture: string;
@@ -47,6 +61,15 @@ interface Recommendation {
   risk_level: "low" | "medium" | "high";
   summary: string;
   warning: string | null;
+  estimated_cost?: {
+    monthly_min: number;
+    monthly_max: number;
+    currency: string;
+    breakdown: CostBreakdownItem[];
+    within_budget: boolean;
+    budget_note: string;
+  };
+  alternatives?: Alternative[];
   feasibility: {
     budget: number;
     scalability: number;
@@ -76,7 +99,7 @@ const SCORE_COLORS: Record<string, string> = {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 function ChatbotPage() {
-  const { repo, service, location } = Route.useSearch();
+  const { repo, service, location, budget } = Route.useSearch();
   const navigate = useNavigate();
 
   const region = REGION_MAP[location] ?? "Singapore";
@@ -88,11 +111,16 @@ function ChatbotPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-generate on mount
+  // ── FIX: guard against React StrictMode double-invoke ──────────────────────
+  const hasRun = useRef(false);
+
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     const firstMsg: Message = {
       role: "user",
-      content: `I want to deploy ${repo} as a ${service} targeting ${location}. Recommend provider, architecture, region, and deployment steps.`,
+      content: `I want to deploy ${repo} as a ${service} targeting ${location} with a monthly budget of $${budget} USD. Recommend provider, architecture, region, and deployment steps.`,
     };
     setMessages([firstMsg]);
     generateRecommendation(firstMsg.content);
@@ -109,7 +137,8 @@ function ChatbotPage() {
     addTypingIndicator();
 
     try {
-      const raw = await analyzeDeployment(repo, service, location, userMessage);
+      // Pass budget to analyzeDeployment
+      const raw = await analyzeDeployment(repo, service, location, budget, userMessage);
       const clean = raw.replace(/```json|```/g, "").trim();
       const parsed: Recommendation = JSON.parse(clean);
       setRec(parsed);
@@ -135,7 +164,12 @@ function ChatbotPage() {
         })
         .join(" + ");
 
-      const aiText = `Repo analyzed. Stack detected: ${stackTags}.\n\n${parsed.summary}${parsed.warning ? `\n\n⚠ ${parsed.warning}` : ""}`;
+      // Include budget info in AI message
+      const costLine = parsed.estimated_cost
+        ? `\n\n💰 Estimated cost: <span class="text-mint font-semibold">$${parsed.estimated_cost.monthly_min}–$${parsed.estimated_cost.monthly_max}/mo</span> · ${parsed.estimated_cost.budget_note}`
+        : "";
+
+      const aiText = `Repo analyzed. Stack detected: ${stackTags}.\n\n${parsed.summary}${costLine}${parsed.warning ? `\n\n⚠ ${parsed.warning}` : ""}`;
 
       removeTypingIndicator();
       setMessages((prev) => [
@@ -172,19 +206,19 @@ function ChatbotPage() {
         repo,
         service,
         region,
+        budget,
         previousAnalysis: rec ? { ...rec } : undefined,
       });
       removeTypingIndicator();
       setMessages((prev) => [...prev, { role: "ai", content: reply }]);
     } catch (error) {
       removeTypingIndicator();
-      console.error("FULL ERROR:", error);
-      alert("Error: " + (error instanceof Error ? error.message + "\n" + error.stack : String(error)));
+      console.error("Follow-up error:", error);
       setMessages((prev) => [
         ...prev,
         {
           role: "ai",
-          content: "Sorry, I couldn't generate a recommendation. Please try again.",
+          content: "Sorry, I couldn't generate a response. Please try again.",
         },
       ]);
     } finally {
@@ -229,6 +263,7 @@ function ChatbotPage() {
             <CtxPill label="REPO" value={repo.replace("github.com/", "")} />
             <CtxPill label="TYPE" value={service} />
             <CtxPill label="REGION" value={region} />
+            <CtxPill label="BUDGET" value={`$${budget}/mo`} />
           </div>
 
           <button
@@ -297,7 +332,8 @@ function ChatbotPage() {
 
           {/* ── Sidebar ── */}
           {sidebarReady && rec && (
-            <aside className="hidden w-64 shrink-0 flex-col gap-3 lg:flex">
+            <aside className="hidden w-72 shrink-0 flex-col gap-3 lg:flex overflow-y-auto max-h-[calc(100vh-6rem)] scrollbar-thin scrollbar-track-transparent scrollbar-thumb-glass-border">
+
               {/* Recommendation card */}
               <div className="glass ring-gradient rounded-3xl p-4 shadow-card">
                 <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -316,6 +352,61 @@ function ChatbotPage() {
                   />
                 </div>
               </div>
+
+              {/* Estimated Cost card */}
+              {rec.estimated_cost && (
+                <div className="glass ring-gradient rounded-3xl p-4 shadow-card">
+                  <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    💰 Estimated Cost
+                  </p>
+                  <div className="mb-3 flex items-end justify-between">
+                    <div>
+                      <p className="text-xl font-bold text-mint">
+                        ${rec.estimated_cost.monthly_min}–${rec.estimated_cost.monthly_max}
+                        <span className="text-xs font-normal text-muted-foreground">/mo</span>
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-muted-foreground">
+                        Budget: ${budget}/mo
+                      </p>
+                    </div>
+                    <span
+                      className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${rec.estimated_cost.within_budget
+                        ? "bg-mint/10 text-mint border border-mint/30"
+                        : "bg-destructive/10 text-destructive border border-destructive/30"
+                        }`}
+                    >
+                      {rec.estimated_cost.within_budget ? (
+                        <><CheckCircle className="h-2.5 w-2.5" /> Within budget</>
+                      ) : (
+                        <><XCircle className="h-2.5 w-2.5" /> Over budget</>
+                      )}
+                    </span>
+                  </div>
+                  <p className="mb-3 text-[10px] text-muted-foreground">{rec.estimated_cost.budget_note}</p>
+                  <div className="space-y-1.5 border-t border-glass-border pt-3">
+                    {rec.estimated_cost.breakdown.map((item, i) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <span className="text-[10px] text-muted-foreground">{item.item}</span>
+                        <span className="font-mono text-[10px] text-foreground">{item.cost}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Provider Comparison card */}
+              {rec.alternatives && rec.alternatives.length > 0 && (
+                <div className="glass ring-gradient rounded-3xl p-4 shadow-card">
+                  <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    ⚡ Provider Comparison
+                  </p>
+                  <div className="space-y-3">
+                    {rec.alternatives.map((alt, i) => (
+                      <AlternativeCard key={i} alt={alt} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Feasibility scores */}
               <div className="glass ring-gradient rounded-3xl p-4 shadow-card">
@@ -340,6 +431,7 @@ function ChatbotPage() {
                   ))}
                 </div>
               </div>
+
             </aside>
           )}
 
@@ -443,6 +535,35 @@ function ResultPill({ label, value, tone }: { label: string; value: string; tone
     >
       <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
       <p className={`mt-0.5 text-xs font-medium ${tone === "warn" ? "text-destructive" : ""}`}>{value}</p>
+    </div>
+  );
+}
+
+function AlternativeCard({ alt }: { alt: Alternative }) {
+  return (
+    <div className="rounded-xl border border-glass-border bg-background/30 p-3">
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-xs font-semibold">{alt.provider}</p>
+        <span className="font-mono text-[10px] text-cyan">{alt.monthly_estimate}</span>
+      </div>
+      <p className="mb-2 text-[10px] text-muted-foreground">{alt.architecture}</p>
+      <div className="mb-2 space-y-0.5">
+        {alt.pros.map((p, i) => (
+          <div key={i} className="flex items-start gap-1">
+            <CheckCircle className="mt-0.5 h-2.5 w-2.5 shrink-0 text-mint" />
+            <span className="text-[10px] text-foreground/80">{p}</span>
+          </div>
+        ))}
+        {alt.cons.map((c, i) => (
+          <div key={i} className="flex items-start gap-1">
+            <XCircle className="mt-0.5 h-2.5 w-2.5 shrink-0 text-destructive/70" />
+            <span className="text-[10px] text-muted-foreground">{c}</span>
+          </div>
+        ))}
+      </div>
+      <div className="rounded-lg bg-violet/10 px-2 py-1">
+        <span className="text-[9px] text-violet">Best for: {alt.best_for}</span>
+      </div>
     </div>
   );
 }

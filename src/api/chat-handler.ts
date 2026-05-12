@@ -7,10 +7,11 @@ export async function analyzeDeployment(
   repo: string,
   service: string,
   region: string,
+  budget: string,
   userMessage: string
 ): Promise<string> {
   try {
-    return await generateDeploymentAnalysis(repo, service, region, userMessage);
+    return await generateDeploymentAnalysis(repo, service, region, budget, userMessage);
   } catch (error) {
     console.error("Analysis error:", error);
     throw error;
@@ -23,6 +24,7 @@ export async function sendFollowUp(
     repo: string;
     service: string;
     region: string;
+    budget?: string;
     previousAnalysis?: Record<string, unknown>;
   }
 ): Promise<string> {
