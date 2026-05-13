@@ -232,6 +232,7 @@ export function ProductDashboard() {
                     { l: "Repository URL", v: "github.com/acme/portal", icon: Github },
                     { l: "Service Type", v: "Fullstack App", icon: Sparkles },
                     { l: "Target Location", v: "Singapore", icon: Globe },
+                    { l: "Budget", v: "$30 / mo", icon: DollarSign },
                   ].map((f) => (
                     <div key={f.l} className="rounded-xl border border-glass-border bg-glass px-3 py-2.5">
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{f.l}</p>

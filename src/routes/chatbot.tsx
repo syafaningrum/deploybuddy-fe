@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
-import { Bot, User, Send, ArrowLeft, Rocket, DollarSign, Zap, CheckCircle, XCircle } from "lucide-react";
+import { Bot, User, Send, ArrowLeft, Rocket, CheckCircle, XCircle } from "lucide-react";
 import { z } from "zod";
 import {
   analyzeDeployment,
@@ -111,7 +111,6 @@ function ChatbotPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // ── FIX: guard against React StrictMode double-invoke ──────────────────────
   const hasRun = useRef(false);
 
   useEffect(() => {
@@ -137,7 +136,6 @@ function ChatbotPage() {
     addTypingIndicator();
 
     try {
-      // Pass budget to analyzeDeployment
       const raw = await analyzeDeployment(repo, service, location, budget, userMessage);
       const clean = raw.replace(/```json|```/g, "").trim();
       const parsed: Recommendation = JSON.parse(clean);
@@ -158,13 +156,11 @@ function ChatbotPage() {
 
       const stackTags = (parsed.stack_detected ?? [])
         .map((s, i) => {
-          const cls =
-            i === 0 ? "text-cyan" : i === 1 ? "text-violet" : "text-mint";
+          const cls = i === 0 ? "text-cyan" : i === 1 ? "text-violet" : "text-mint";
           return `<span class="font-mono ${cls}">${s}</span>`;
         })
         .join(" + ");
 
-      // Include budget info in AI message
       const costLine = parsed.estimated_cost
         ? `\n\n💰 Estimated cost: <span class="text-mint font-semibold">$${parsed.estimated_cost.monthly_min}–$${parsed.estimated_cost.monthly_max}/mo</span> · ${parsed.estimated_cost.budget_note}`
         : "";
@@ -172,21 +168,14 @@ function ChatbotPage() {
       const aiText = `Repo analyzed. Stack detected: ${stackTags}.\n\n${parsed.summary}${costLine}${parsed.warning ? `\n\n⚠ ${parsed.warning}` : ""}`;
 
       removeTypingIndicator();
-      setMessages((prev) => [
-        ...prev,
-        { role: "ai", content: aiText, pills },
-      ]);
+      setMessages((prev) => [...prev, { role: "ai", content: aiText, pills }]);
       setSidebarReady(true);
     } catch (error) {
       removeTypingIndicator();
       console.error("Error generating recommendation:", error);
       setMessages((prev) => [
         ...prev,
-        {
-          role: "ai",
-          content:
-            "Sorry, I couldn't generate a recommendation. Please try again.",
-        },
+        { role: "ai", content: "Sorry, I couldn't generate a recommendation. Please try again." },
       ]);
     } finally {
       setLoading(false);
@@ -213,21 +202,14 @@ function ChatbotPage() {
       setMessages((prev) => [...prev, { role: "ai", content: reply }]);
     } catch (error) {
       removeTypingIndicator();
-      console.error("Follow-up error:", error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "ai",
-          content: "Sorry, I couldn't generate a response. Please try again.",
-        },
-      ]);
+      const errMsg = error instanceof Error ? `ERROR: ${error.message}` : `ERROR: ${JSON.stringify(error)}`;
+      console.error("Full error:", error);
+      setMessages((prev) => [...prev, { role: "ai", content: errMsg }]);
     } finally {
       setLoading(false);
       inputRef.current?.focus();
     }
   }
-
-  // ── Typing Helpers ──────────────────────────────────────────────────────────
 
   function addTypingIndicator() {
     setMessages((prev) => [...prev, { role: "ai", content: "", isTyping: true }]);
@@ -250,29 +232,36 @@ function ChatbotPage() {
 
       {/* ── Navbar ── */}
       <header className="relative z-50 px-4 pt-4">
-        <nav className="glass mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-4 py-2.5 shadow-card">
-          <a href="/" className="flex items-center gap-2">
+        <nav className="glass mx-auto flex max-w-6xl items-center gap-3 rounded-2xl px-3 py-2.5 shadow-card">
+
+          {/* Back button — sejajar di dalam navbar */}
+          <button
+            onClick={() => navigate({ to: "/" })}
+            className="flex shrink-0 items-center gap-1.5 rounded-xl border border-glass-border bg-background/40 px-3 py-1.5 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Back
+          </button>
+
+          {/* Divider */}
+          <div className="h-5 w-px shrink-0 bg-glass-border" />
+
+          {/* Logo */}
+          <a href="/" className="flex shrink-0 items-center gap-2">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-primary glow">
               <Rocket className="h-4 w-4 text-primary-foreground" />
             </span>
             <span className="font-semibold tracking-tight">DeployBuddy</span>
           </a>
 
-          {/* Context pills */}
-          <div className="hidden items-center gap-2 md:flex">
+          {/* Context pills — push to right */}
+          <div className="ml-auto hidden items-center gap-2 md:flex">
             <CtxPill label="REPO" value={repo.replace("github.com/", "")} />
             <CtxPill label="TYPE" value={service} />
             <CtxPill label="REGION" value={region} />
             <CtxPill label="BUDGET" value={`$${budget}/mo`} />
           </div>
 
-          <button
-            onClick={() => navigate({ to: "/" })}
-            className="flex items-center gap-1.5 rounded-xl border border-glass-border bg-glass px-3 py-1.5 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
-          >
-            <ArrowLeft className="h-3 w-3" />
-            New Analysis
-          </button>
         </nav>
       </header>
 
@@ -370,10 +359,11 @@ function ChatbotPage() {
                       </p>
                     </div>
                     <span
-                      className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${rec.estimated_cost.within_budget
-                        ? "bg-mint/10 text-mint border border-mint/30"
-                        : "bg-destructive/10 text-destructive border border-destructive/30"
-                        }`}
+                      className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                        rec.estimated_cost.within_budget
+                          ? "bg-mint/10 text-mint border border-mint/30"
+                          : "bg-destructive/10 text-destructive border border-destructive/30"
+                      }`}
                     >
                       {rec.estimated_cost.within_budget ? (
                         <><CheckCircle className="h-2.5 w-2.5" /> Within budget</>
@@ -474,14 +464,12 @@ function MessageRow({ msg }: { msg: Message }) {
     );
   }
 
-  // AI message
   return (
     <div className="flex gap-2">
       <AiAvatar />
       <div className="flex-1 space-y-3">
         <div
           className="rounded-2xl rounded-tl-sm border border-primary/20 bg-primary/5 px-4 py-3 text-sm leading-relaxed"
-          // Safe: content only comes from Claude API response or static strings
           dangerouslySetInnerHTML={{ __html: msg.content.replace(/\n/g, "<br />") }}
         />
         {msg.pills && msg.pills.length > 0 && (
@@ -516,10 +504,9 @@ function CtxPill({ label, value }: { label: string; value: string }) {
 function SbItem({ label, value, tone }: { label: string; value: string; tone?: "warn" }) {
   return (
     <div
-      className={`rounded-xl border p-2.5 ${tone === "warn"
-        ? "border-destructive/30 bg-destructive/5"
-        : "border-glass-border bg-background/30"
-        }`}
+      className={`rounded-xl border p-2.5 ${
+        tone === "warn" ? "border-destructive/30 bg-destructive/5" : "border-glass-border bg-background/30"
+      }`}
     >
       <p className="text-[9.5px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
       <p className={`mt-0.5 text-xs font-medium ${tone === "warn" ? "text-destructive" : ""}`}>{value}</p>
@@ -530,8 +517,9 @@ function SbItem({ label, value, tone }: { label: string; value: string; tone?: "
 function ResultPill({ label, value, tone }: { label: string; value: string; tone?: "warn" }) {
   return (
     <div
-      className={`rounded-xl border p-2.5 ${tone === "warn" ? "border-destructive/40 bg-destructive/5" : "border-glass-border bg-glass"
-        }`}
+      className={`rounded-xl border p-2.5 ${
+        tone === "warn" ? "border-destructive/40 bg-destructive/5" : "border-glass-border bg-glass"
+      }`}
     >
       <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
       <p className={`mt-0.5 text-xs font-medium ${tone === "warn" ? "text-destructive" : ""}`}>{value}</p>

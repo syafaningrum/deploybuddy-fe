@@ -1,7 +1,7 @@
 import { generateText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-1.5-flash-latest";
 
 const google = createGoogleGenerativeAI({
   apiKey: import.meta.env.VITE_GOOGLE_GENERATIVE_AI_API_KEY,
