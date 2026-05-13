@@ -7,6 +7,7 @@ import {
   Github, Server, Send, User, ChevronRight,
   Eye, EyeOff, Key, Plus, Trash2,
 } from "lucide-react";
+import logo from "@/assets/Logo DeployBuddy + text.png";
 
 /* ------------------------------- Section UI ------------------------------- */
 
@@ -199,10 +200,7 @@ export function ProductDashboard() {
             {/* sidebar */}
             <aside className="col-span-12 border-b border-glass-border p-3 md:col-span-3 md:border-b-0 md:border-r md:p-4">
               <div className="mb-3 flex items-center gap-2 px-2">
-                <span className="grid h-7 w-7 place-items-center rounded-md bg-gradient-primary">
-                  <Rocket className="h-3.5 w-3.5 text-primary-foreground" />
-                </span>
-                <span className="text-sm font-semibold">DeployBuddy</span>
+                <img src={logo} alt="DeployBuddy" className="h-6 w-auto" />
               </div>
               <nav className="space-y-1">
                 {sidebar.map((s) => (
@@ -933,10 +931,7 @@ export function Footer() {
     <footer className="border-t border-glass-border py-10">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-sm text-muted-foreground md:flex-row">
         <div className="flex items-center gap-2">
-          <span className="grid h-6 w-6 place-items-center rounded-md bg-gradient-primary">
-            <Rocket className="h-3 w-3 text-primary-foreground" />
-          </span>
-          <span className="font-semibold text-foreground">DeployBuddy</span>
+          <img src={logo} alt="DeployBuddy" className="h-6 w-auto" />
           <span className="font-mono text-xs">© 2026</span>
         </div>
         <div className="flex items-center gap-5">

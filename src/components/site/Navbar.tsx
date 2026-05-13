@@ -1,5 +1,5 @@
 import { Rocket } from "lucide-react";
-
+import logo from "@/assets/Logo DeployBuddy + text.png";
 
 // const links = ["Product", "Features", "How It Works", "Providers", "Pricing", "Keys"];
 
@@ -10,10 +10,7 @@ export function Navbar() {
     <header className="fixed top-4 inset-x-0 z-50 px-4">
       <nav className="glass mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-4 py-2.5 shadow-card">
         <a href="#top" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-primary glow">
-            <Rocket className="h-4 w-4 text-primary-foreground" />
-          </span>
-          <span className="font-semibold tracking-tight">DeployBuddy</span>
+          <img src={logo} alt="DeployBuddy" className="h-8 w-auto" />
         </a>
         <ul className="hidden md:flex items-center gap-7 text-sm text-muted-foreground">
           {links.map((l) => (

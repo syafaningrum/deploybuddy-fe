@@ -1,11 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { Bot, User, Send, ArrowLeft, Rocket, CheckCircle, XCircle } from "lucide-react";
+import logo from "@/assets/Logo DeployBuddy + text.png";
 import { z } from "zod";
 import {
   analyzeDeployment,
   sendFollowUp,
 } from "@/api/chat-handler";
+
 
 // ── Route Definition ──────────────────────────────────────────────────────────
 
@@ -248,10 +250,7 @@ function ChatbotPage() {
 
           {/* Logo */}
           <a href="/" className="flex shrink-0 items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-primary glow">
-              <Rocket className="h-4 w-4 text-primary-foreground" />
-            </span>
-            <span className="font-semibold tracking-tight">DeployBuddy</span>
+            <img src={logo} alt="DeployBuddy" className="h-6 w-auto" />
           </a>
 
           {/* Context pills — push to right */}
